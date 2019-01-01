@@ -4,12 +4,13 @@ from datetime import datetime, date, timedelta
 
 root = "https://www8.iowa-city.org/icgov/apps/police/blotter.asp"
 pushing = False
+webhook = None
 
 #Try to setup Discord webhook to push notifications
 def tryDiscord():
 	try:
-		import discord
-		from discord import Webhook, RequestsWebhookAdapter, File
+		import DiscordHooks
+		from DiscordHooks import Hook
 	except ImportError:
 		discord = None 
 	if discord:
@@ -17,7 +18,7 @@ def tryDiscord():
 		config = configparser.ConfigParser()
 		URL = config["DiscordIntegration"]["WebhookURL"]
 		if(URL != None):
-			hook = Webhook.from_url(URL, adapter=RequestsWebhookAdapter())
+			webhook = Hook(hook_url=URL)
 			pushing = True
 			print("Webhook setup complete")
 		else:
