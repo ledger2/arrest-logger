@@ -35,6 +35,7 @@ def query(dateString):
 		
 def prettyPrintout(dict):
 	#dictionary formatting: {"name": [offenseDatetime, dateOfBirth, arrestLocation, incidentNum, arrested, chargesList]}
+	return None
 
 tryDiscord()
 
