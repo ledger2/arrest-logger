@@ -39,7 +39,7 @@ def prettyPrintout(dict):
 
 tryDiscord()
 
-dateToFetch = datetime.now()-datetime.timedelta()
-newData = query(str())
+dateToFetch = datetime.today()-timedelta(days=1)
+newData = query(dateToFetch.strftime("%m%d%y")
 print("Fetched...\n")
 print(newData)
