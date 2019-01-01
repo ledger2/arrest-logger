@@ -2,7 +2,7 @@ import requests
 import configparser
 from datetime import datetime, date, timedelta
 
-root = "https://www8.iowa-city.org/icgov/apps/police/blotter.asp?date="
+root = "https://www8.iowa-city.org/icgov/apps/police/blotter.asp"
 pushing = False
 
 #Try to setup Discord webhook to push notifications
