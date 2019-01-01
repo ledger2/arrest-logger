@@ -12,8 +12,8 @@ def tryDiscord():
 		import DiscordHooks
 		from DiscordHooks import Hook
 	except ImportError:
-		discord = None 
-	if discord:
+		DiscordHooks = None 
+	if DiscordHooks:
 		print("Discord integration loading...")
 		config = configparser.ConfigParser()
 		URL = config["DiscordIntegration"]["WebhookURL"]
