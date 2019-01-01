@@ -31,7 +31,7 @@ def query(dateString):
 		#Successful fetch, format and return data
  		return r.text
 	else:
-		print("Query failed. (Status: "+str(r.status_code)+")")
+		print("Query failed. (Status: "+str(r.status_code)+"), URL: "+r.url)
 		
 def prettyPrintout(dict):
 	#dictionary formatting: {"name": [offenseDatetime, dateOfBirth, arrestLocation, incidentNum, arrested, chargesList]}
