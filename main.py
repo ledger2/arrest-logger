@@ -16,12 +16,12 @@ def tryDiscord():
 	if DiscordHooks:
 		print("Discord integration loading...")
 		config = configparser.ConfigParser()
-		URL = config["DiscordIntegration"]["WebhookURL"]
-		if(URL != None):
+		try:
+			URL = config["DiscordIntegration"]["WebhookURL"]
 			webhook = Hook(hook_url=URL)
 			pushing = True
 			print("Webhook setup complete")
-		else:
+		except:
 			print("Webhook URL not supplied in 'config.ini'!")
 
 #Fetch data on specified date (dateString MMDDYYYY)
