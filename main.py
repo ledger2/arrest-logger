@@ -11,6 +11,7 @@ useDB = False
 webhook = None
 config = configparser.ConfigParser()
 config.read('config.ini', encoding='utf-8')
+dbConnection = sqlite3.connect("arrests.db")
 
 
 #Try to setup Discord webhook to push notifications
@@ -33,7 +34,6 @@ def tryDiscord():
 
 def setup():
 	if(config["General"]["UsingDatabase"] == "yes"):
-		dbConnection = sqlite3.connect("arrests.db")
 		db = dbConnection.cursor()
 		useDB = True
 		db.execute("CREATE TABLE IF NOT EXISTS arrests(incident INTEGER PRIMARY KEY, name TEXT, address TEXT, birthday TEXT, offenseDate TEXT, location TEXT, arrested TEXT, charges TEXT, UNIQUE(incident)) WITHOUT ROWID;")
@@ -46,7 +46,6 @@ def setup():
 
 #store the data and mark date as fetched
 def logData(transfer, dateFetched):
-	dbConnection = sqlite3.connect("arrests.db")
 	db = dbConnection.cursor()
 	for i in transfer:
 		db.execute("INSERT OR IGNORE INTO arrests(incident,name,address,birthday,offenseDate,location,arrested,charges) VALUES("
@@ -124,12 +123,27 @@ def prettyPrintout(dict):
 	#dictionary formatting
 	return None
 
+
+def collect(dateString):
+	newData = query(dateString)
+	print("Fetched...\n")
+	print(newData)
+	print("----------")
+	logData(newData,dateString)
 	
 setup()
 
-dateToFetch = (datetime.today()-timedelta(days=1)).strftime("%m%d%Y")
-newData = query(dateToFetch)
-print("Fetched...\n")
-print(newData)
-print("")
-logData(newData,dateToFetch)
+cur = dbConnection.cursor()
+cur.execute("SELECT * FROM datesFetched")
+dates = cur.fetchall()
+todayTemp = datetime.today()				#in case this is ran at like 11:59pm
+for i in range(30):
+	skip = False
+	curDate = (todayTemp-timedelta(days=(i+1))).strftime("%m%d%Y")
+	for row in dates:
+		if(row[0].zfill(8) == curDate):
+			skip = True
+	if(skip != True):
+		collect(curDate)
+		
+#dateToFetch = (datetime.today()-timedelta(days=1)).strftime("%m%d%Y")
