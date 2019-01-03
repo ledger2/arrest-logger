@@ -46,6 +46,8 @@ def setup():
 
 #store the data and mark date as fetched
 def logData(transfer, dateFetched):
+	dbConnection = sqlite3.connect("arrests.db")
+	db = dbConnection.cursor()
 	for i in transfer:
 		db.execute("INSERT OR IGNORE INTO arrests(incident,name,address,birthday,offenseDate,location,arrested,charges) VALUES("
 					+str(i[0])+str(i[1])+str(i[3])+str(i[4])+str(i[5])+str(i[6])+str(i[7])+");")
