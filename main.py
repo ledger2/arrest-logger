@@ -50,7 +50,15 @@ def logData(transfer, dateFetched):
 	db = dbConnection.cursor()
 	for i in transfer:
 		db.execute("INSERT OR IGNORE INTO arrests(incident,name,address,birthday,offenseDate,location,arrested,charges) VALUES("
-					+str(transfer.get(i)[0])+","+transfer.get(i)[1]+","+transfer.get(i)[2]+","+transfer.get(i)[3]+","+transfer.get(i)[4]+","+transfer.get(i)[5]+","+transfer.get(i)[6]+","+transfer.get(i)[7]+");")
+					+i
+					+",\""+transfer.get(i)[0]
+					+"\",\""+transfer.get(i)[1]
+					+"\",\""+transfer.get(i)[2]
+					+"\",\""+transfer.get(i)[3]
+					+"\",\""+transfer.get(i)[4]
+					+"\",\""+transfer.get(i)[5]
+					+"\",\""+transfer.get(i)[6]
+					+"\");")
 	db.execute("INSERT OR IGNORE INTO datesFetched(date,fetched) VALUES("
 				+dateFetched+","+datetime.today().strftime("%m-%d-%Y")+");")
 	dbConnection.commit()
@@ -123,4 +131,5 @@ dateToFetch = (datetime.today()-timedelta(days=1)).strftime("%m%d%Y")
 newData = query(dateToFetch)
 print("Fetched...\n")
 print(newData)
+print("")
 logData(newData,dateToFetch)
