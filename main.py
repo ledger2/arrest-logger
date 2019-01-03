@@ -117,8 +117,8 @@ def prettyPrintout(dict):
 	
 setup()
 
-dateToFetch = datetime.today()-timedelta(days=1)
-newData = query(dateToFetch.strftime("%m%d%Y"))
+dateToFetch = (datetime.today()-timedelta(days=1)).strftime("%m%d%Y")
+newData = query(dateToFetch)
 print("Fetched...\n")
 print(newData)
-logData(newData)
+logData(newData,dateToFetch)
