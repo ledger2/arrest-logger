@@ -59,7 +59,7 @@ def logData(transfer, dateFetched):
 					+"\",\""+transfer.get(i)[6]
 					+"\");")
 	db.execute("INSERT OR IGNORE INTO datesFetched(date,fetched) VALUES("
-				+dateFetched+","+datetime.today().strftime("%m-%d-%Y")+");")
+				+dateFetched+","+datetime.today().strftime("%m%d%Y")+");")
 	dbConnection.commit()
 					
 
