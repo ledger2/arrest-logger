@@ -7,9 +7,10 @@ root = "https://www8.iowa-city.org/icgov/apps/police/blotter.asp"
 findText = "<strong>Charge(s)</strong>" #String used to strip most of the raw HTML down and locate table
 
 pushing = False
-storing = False
+useDB = False
 webhook = None
 config = configparser.ConfigParser()
+config.read('config.ini', encoding='utf-8')
 
 
 #Try to setup Discord webhook to push notifications
@@ -31,14 +32,15 @@ def tryDiscord():
 
 
 def setup():
-	if(config["General"]["UsingDatabase"] == yes):
-		try:
-			dbConnection = sqlite3.connect("arrests.db")
-			db = dbConnection.cursor()
-			storing = True
-			db.execute("CREATE TABLE IF NOT EXISTS arrests(incident INTEGER PRIMARY KEY, name TEXT, birthday TEXT, incidentTime TEXT, location TEXT, arrested BOOLEAN, charges TEXT) WITHOUT ROWID;")
-			db.execute("CREATE TABLE IF NOT EXISTS datesFetched(date TEXT, fetched TEXT) WITHOUT ROWID;")
-			db.commit()
+	if(config["General"]["UsingDatabase"] == "yes"):
+		dbConnection = sqlite3.connect("arrests.db")
+		db = dbConnection.cursor()
+		useDB = True
+		db.execute("CREATE TABLE IF NOT EXISTS arrests(incident INTEGER PRIMARY KEY, name TEXT, birthday TEXT, incidentTime TEXT, location TEXT, arrested TEXT, charges TEXT) WITHOUT ROWID;")
+		db.execute("CREATE TABLE IF NOT EXISTS datesFetched(date TEXT PRIMARY KEY, fetched TEXT) WITHOUT ROWID;")
+		dbConnection.commit()
+	else:
+		print("Not using local DB!")
 	tryDiscord()
 
 
@@ -57,32 +59,34 @@ def stripTable(raw):
 	while True:
 		case = 0
 		toStore = []
-		next = raw[next:].find("<!--")+next #find new arrest
-		if(next != -1):
+		toNext = raw[next:].find("<!--")
+		if(toNext != -1):						#Verify there actually is a next...
+			next = toNext+next					#...and set it up
 			for i in elements:
 				next = raw[next:].find(i)+len(i)+next
 				end = raw[next:].find("</span>")+next
 				if(i == elements[5]):								#special routine for grabbing ID
 					case = raw[next:end]
 				elif(i == elements[7]):								#special clean routine for charges
-					storing = raw[next:end].replace("<br/>"," // ")
 					if(storing[len(storing)-1] == " "): 			#clean ending
 						storing = storing[:len(storing)-1]
+					storing = raw[next:end].replace("<br/>"," // ")
 					toStore.append(storing)
 				else:
 					storing = raw[next:end]
-					if(storing[len(storing)-1] == " "):				#clean ending
-						storing = storing[:len(storing)-1]
+					if(len(storing) > 0):						#empty fields need to be filtered out
+						if(storing[len(storing)-1] == " "):			#clean ending
+							storing = storing[:len(storing)-1]
 					toStore.append(storing)
 			results[case] = toStore
 		else:
 			break
-		break
 	print("Query stripped")
 	return results
 
 #Fetch data on specified date (dateString MMDDYYYY)
 def query(dateString):
+	print("Querying "+dateString)
 	get = {"date":dateString}
 	r = requests.get(root, params=get)
 	if(r.status_code == 200):
@@ -92,7 +96,7 @@ def query(dateString):
 		print("HTML query received")
 		return stripTable(r.text[start:])
 	else:
-		print("HTML query failed. (Status: "+str(r.status_code)+"), URL: "+r.url)
+		print("HTML query failed. (Status: "+str(r.status_code)+", URL: "+r.url+")")
 
 		
 def prettyPrintout(dict):
