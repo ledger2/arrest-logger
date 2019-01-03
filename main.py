@@ -52,7 +52,7 @@ def logData(transfer, dateFetched):
 		db.execute("INSERT OR IGNORE INTO arrests(incident,name,address,birthday,offenseDate,location,arrested,charges) VALUES("
 					+str(i[0])+","+str(i[1])+","+str(i[2])+","+str(i[3])+","+str(i[4])+","+str(i[5])+","+str(i[6])+","+str(i[7])+");")
 	db.execute("INSERT OR IGNORE INTO datesFetched(date,fetched) VALUES("
-				+dateFetched+","+str(datetime.today())+");")
+				+dateFetched+","+datetime.today().strftime("%m-%d-%Y")+");")
 	dbConnection.commit()
 					
 
