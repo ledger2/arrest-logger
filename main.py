@@ -36,13 +36,23 @@ def setup():
 		dbConnection = sqlite3.connect("arrests.db")
 		db = dbConnection.cursor()
 		useDB = True
-		db.execute("CREATE TABLE IF NOT EXISTS arrests(incident INTEGER PRIMARY KEY, name TEXT, birthday TEXT, incidentTime TEXT, location TEXT, arrested TEXT, charges TEXT) WITHOUT ROWID;")
-		db.execute("CREATE TABLE IF NOT EXISTS datesFetched(date TEXT PRIMARY KEY, fetched TEXT) WITHOUT ROWID;")
+		db.execute("CREATE TABLE IF NOT EXISTS arrests(incident INTEGER PRIMARY KEY, name TEXT, address TEXT, birthday TEXT, offenseDate TEXT, location TEXT, arrested TEXT, charges TEXT, UNIQUE(incident)) WITHOUT ROWID;")
+		db.execute("CREATE TABLE IF NOT EXISTS datesFetched(date TEXT PRIMARY KEY, fetched TEXT, UNIQUE(date)) WITHOUT ROWID;")
 		dbConnection.commit()
 	else:
 		print("Not using local DB!")
 	tryDiscord()
+	
 
+#store the data and mark date as fetched
+def logData(transfer, dateFetched):
+	for i in transfer:
+		db.execute("INSERT OR IGNORE INTO arrests(incident,name,address,birthday,offenseDate,location,arrested,charges) VALUES("
+					+str(i[0])+str(i[1])+str(i[3])+str(i[4])+str(i[5])+str(i[6])+str(i[7])+");")
+	db.execute("INSERT OR IGNORE INTO datesFetched(date,fetched) VALUES("
+				+dateFetched+datetime.today()+");")
+	dbConnection.commit()
+					
 
 #take trimmed HTML and return results. Should return empty dictionary if no results
 def stripTable(raw):
@@ -83,6 +93,7 @@ def stripTable(raw):
 			break
 	print("Query stripped")
 	return results
+	
 
 #Fetch data on specified date (dateString MMDDYYYY)
 def query(dateString):
@@ -100,7 +111,7 @@ def query(dateString):
 
 		
 def prettyPrintout(dict):
-	#dictionary formatting: {incident: [name, dateOfBirth, offenseDatetime, arrestLocation, incidentNum, arrested, chargesList]}
+	#dictionary formatting
 	return None
 
 	
